@@ -94,6 +94,7 @@ void prog_game(struct Prog *p)
 {
     stbi_set_flip_vertically_on_load(true);
     struct Texture *checkmark = tex_alloc("res/check.png");
+    struct Texture *cross = tex_alloc("res/cross.png");
     stbi_set_flip_vertically_on_load(false);
     glfwSetKeyCallback(p->win, key_callback);
 
@@ -120,6 +121,7 @@ void prog_game(struct Prog *p)
     float check_expand = 1.f;
     float check_expand_vel = .1f;
     float check_expand_acc = -.01f;
+    bool submit_correct = false;
 
     while (p->running)
     {
@@ -132,12 +134,12 @@ void prog_game(struct Prog *p)
         {
             if (p->board->last_cleared == p->questions[p->curr_q]->answer)
             {
-                printf("Correct\n");
+                submit_correct = true;
                 last_submit = glfwGetTime();
             }
             else
             {
-                printf("Wrong\n");
+                submit_correct = false;
                 last_submit = glfwGetTime();
             }
 
@@ -201,7 +203,7 @@ void prog_game(struct Prog *p)
                 glViewport(0, 0, SCRW, SCRH);
                 ri_use_shader(p->ri, SHADER_IMAGE);
                 glDisable(GL_CULL_FACE);
-                ri_render_image(p->ri, checkmark, SCRW / 2.f - 50.f, SCRH / 2.f - 50.f, 100.f, 100.f, (vec2){ -QWIDTH / SCRW, 0.f }, (vec2){ check_expand, check_expand });
+                ri_render_image(p->ri, submit_correct ? checkmark : cross, SCRW / 2.f - 50.f, SCRH / 2.f - 50.f, 100.f, 100.f, (vec2){ -QWIDTH / SCRW, 0.f }, (vec2){ check_expand, check_expand });
                 glEnable(GL_CULL_FACE);
 
                 glDisable(GL_BLEND);
@@ -220,6 +222,7 @@ void prog_game(struct Prog *p)
         glfwPollEvents();
     }
 
+    tex_free(cross);
     tex_free(checkmark);
     tex_free(norm_map);
     board_free(p->board);
