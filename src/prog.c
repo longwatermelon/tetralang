@@ -1,5 +1,4 @@
 #include "prog.h"
-#include "GLFW/glfw3.h"
 #include "cube.h"
 #include "piece.h"
 #include "render.h"
@@ -7,8 +6,10 @@
 #include "board.h"
 #include "skybox.h"
 #include "util.h"
+#include "texture.h"
 #include <stdlib.h>
 #include <cglm/cglm.h>
+#include <GLFW/glfw3.h>
 
 struct Prog *g_prog;
 
@@ -97,6 +98,8 @@ void prog_game(struct Prog *p)
 
     p->board = board_alloc();
 
+    struct Texture *norm_map = tex_alloc("res/normal.jpg");
+
     while (p->running)
     {
         if (glfwWindowShouldClose(p->win))
@@ -121,6 +124,10 @@ void prog_game(struct Prog *p)
         shader_int(p->ri->shader, "skybox", 0);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, p->skybox->tex);
+
+        shader_int(p->ri->shader, "norm_map", 1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, norm_map->id);
 
         board_render(p->board, p->ri);
         // piece_move(piece, (vec3){ 0.f, .01f, .02f });

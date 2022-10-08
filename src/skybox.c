@@ -104,7 +104,6 @@ struct Skybox *skybox_alloc(const char *prefix)
     return s;
 }
 
-
 void skybox_free(struct Skybox *s)
 {
     glDeleteTextures(1, &s->tex);
@@ -114,7 +113,6 @@ void skybox_free(struct Skybox *s)
 
     free(s);
 }
-
 
 void skybox_render(struct Skybox *s, RenderInfo *ri)
 {

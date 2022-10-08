@@ -7,10 +7,11 @@ in vec3 f_col;
 in vec2 f_tc;
 
 uniform samplerCube skybox;
+uniform sampler2D norm_map;
 
 void main()
 {
-    vec3 norm = normalize(f_norm);
+    vec3 norm = normalize(texture(norm_map, f_tc).rgb);
 
     float ratio = 1. / 1.4;
     vec3 I = normalize(f_pos);
