@@ -26,5 +26,6 @@ struct Prog *prog_alloc(GLFWwindow *win);
 void prog_free(struct Prog *p);
 
 void prog_game(struct Prog *p);
+void prog_title(struct Prog *p);
 
 #endif

@@ -5,6 +5,7 @@
 #include "shader.h"
 #include "board.h"
 #include "skybox.h"
+#include "stb/stb_image.h"
 #include "util.h"
 #include "texture.h"
 #include <stdlib.h>
@@ -54,6 +55,7 @@ struct Prog *prog_alloc(GLFWwindow *win)
     p->ri = ri_alloc();
     ri_add_shader(p->ri, SHADER_TETRIS, "shaders/tetris.vert", "shaders/tetris.frag");
     ri_add_shader(p->ri, SHADER_SKYBOX, "shaders/skybox.vert", "shaders/skybox.frag");
+    ri_add_shader(p->ri, SHADER_TITLE, "shaders/title.vert", "shaders/title.frag");
 
     p->skybox = skybox_alloc("res/skybox/");
 
@@ -73,6 +75,7 @@ void prog_free(struct Prog *p)
 
 void prog_game(struct Prog *p)
 {
+    stbi_set_flip_vertically_on_load(false);
     glfwSetKeyCallback(p->win, key_callback);
 
     glEnable(GL_DEPTH_TEST);
@@ -157,4 +160,56 @@ void prog_game(struct Prog *p)
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+}
+
+void prog_title(struct Prog *p)
+{
+    stbi_set_flip_vertically_on_load(true);
+    float verts[] = {
+        -1.f, -1.f, 0.f, 0.f,
+        -1.f, 1.f, 0.f, 1.f,
+        1.f, 1.f, 1.f, 1.f,
+
+        -1.f, -1.f, 0.f, 0.f,
+        1.f, -1.f, 1.f, 0.f,
+        1.f, 1.f, 1.f, 1.f
+    };
+
+    unsigned int vao, vb;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glGenBuffers(1, &vb);
+    glBindBuffer(GL_ARRAY_BUFFER, vb);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    struct Texture *bg = tex_alloc("res/title.jpg");
+
+    bool running = true;
+
+    while (running)
+    {
+        if (glfwWindowShouldClose(p->win) || glfwGetKey(p->win, GLFW_KEY_SPACE) == GLFW_PRESS)
+            running = false;
+        
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        ri_use_shader(p->ri, SHADER_TITLE);
+        shader_int(p->ri->shader, "bg", 0);
+        tex_bind(bg, 0);
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        glfwSwapBuffers(p->win);
+        glfwPollEvents();
+    }
+
+    glDeleteBuffers(1, &vb);
+    glDeleteVertexArrays(1, &vao);
 }

@@ -20,6 +20,7 @@ int main()
     glViewport(0, 0, SCRW, SCRH);
 
     struct Prog *p = prog_alloc(win);
+    prog_title(p);
     prog_game(p);
     prog_free(p);
 
