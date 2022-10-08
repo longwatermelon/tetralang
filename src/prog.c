@@ -94,6 +94,8 @@ void prog_game(struct Prog *p)
 
     struct Texture *norm_map = tex_alloc("res/normal.jpg");
 
+    struct Texture *qbg = tex_alloc("res/qbg.png");
+
     while (p->running)
     {
         if (glfwWindowShouldClose(p->win))
@@ -113,6 +115,8 @@ void prog_game(struct Prog *p)
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Game
         glViewport(0, 0, SCRW - QWIDTH, SCRH);
 
         ri_use_shader(p->ri, SHADER_SKYBOX);
@@ -135,6 +139,14 @@ void prog_game(struct Prog *p)
         glBindTexture(GL_TEXTURE_2D, norm_map->id);
 
         board_render(p->board, p->ri);
+
+        // Questions
+        ri_use_shader(p->ri, SHADER_IMAGE);
+        glViewport(0, 0, SCRW, SCRH);
+
+        glDisable(GL_CULL_FACE);
+        ri_render_image(p->ri, qbg, SCRW - QWIDTH, 0, QWIDTH, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        glEnable(GL_CULL_FACE);
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
