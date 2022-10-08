@@ -14,6 +14,8 @@
 
 struct Prog *g_prog;
 
+#define QWIDTH 300
+
 static void key_callback(GLFWwindow *win, int key, int scancode, int action, int mods)
 {
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
@@ -103,6 +105,8 @@ void prog_game(struct Prog *p)
     mat4 view;
     glm_look((vec3){ 0.f, 0.f, 0.f }, (vec3){ 1.f, 0.f, 0.f }, (vec3){ 0.f, 1.f, 0.f }, view);
 
+    glm_perspective(glm_rad(45.f), (SCRW - QWIDTH) / SCRH, .1f, 1000.f, p->ri->proj);
+
     p->board = board_alloc();
 
     struct Texture *norm_map = tex_alloc("res/normal.jpg");
@@ -126,7 +130,7 @@ void prog_game(struct Prog *p)
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glViewport(0, 0, SCRW, SCRH);
+        glViewport(0, 0, SCRW - QWIDTH, SCRH);
 
         ri_use_shader(p->ri, SHADER_SKYBOX);
         skybox_render(p->skybox, p->ri);
