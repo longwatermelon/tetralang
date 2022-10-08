@@ -1,9 +1,12 @@
 #include "prog.h"
-#include "cglm/mat4.h"
+#include "cube.h"
+#include "piece.h"
 #include "render.h"
 #include "shader.h"
+#include "board.h"
 #include "util.h"
 #include <stdlib.h>
+#include <cglm/cglm.h>
 
 struct Prog *prog_alloc(GLFWwindow *win)
 {
@@ -30,25 +33,34 @@ void prog_game(struct Prog *p)
 
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
-    float verts[] = {
-        2.f, 0.f, 0.f,
-        2.f, -1.f, 0.f,
-        2.f, -1.f, 1.f
-    };
+    // float verts[] = {
+    //     2.f, 0.f, 0.f,
+    //     2.f, -1.f, 0.f,
+    //     2.f, -1.f, 1.f
+    // };
 
-    unsigned int vao, vb;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    // unsigned int vao, vb;
+    // glGenVertexArrays(1, &vao);
+    // glBindVertexArray(vao);
 
-    glGenBuffers(1, &vb);
-    glBindBuffer(GL_ARRAY_BUFFER, vb);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+    // glGenBuffers(1, &vb);
+    // glBindBuffer(GL_ARRAY_BUFFER, vb);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-    glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    // glEnableVertexAttribArray(0);
 
     mat4 view;
     glm_look((vec3){ 0.f, 0.f, 0.f }, (vec3){ 1.f, 0.f, 0.f }, (vec3){ 0.f, 1.f, 0.f }, view);
+
+    struct Board *board = board_alloc();
+
+    struct Cube **cubes = malloc(sizeof(struct Cube*));
+    cubes[0] = cube_alloc((vec3){ 5.f, 0.f, 0.f }, (vec3){ 1.f, 0.f, 0.f });
+
+    struct Piece *piece = piece_alloc(cubes, 1);
+    board_add_piece(board, piece);
+    board_fill_verts(board);
 
     while (p->running)
     {
@@ -66,11 +78,16 @@ void prog_game(struct Prog *p)
         glm_mat4_identity(model);
         shader_mat4(p->ri->shader, "model", model);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        board_render(board, p->ri);
+        piece_move(piece, (vec3){ 0.f, .01f, .02f });
+
+        // glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
     }
+
+    board_free(board);
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
