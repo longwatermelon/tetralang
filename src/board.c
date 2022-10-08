@@ -44,6 +44,8 @@ struct Board *board_alloc()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    board_make_borders(b);
+
     return b;
 }
 
@@ -106,4 +108,37 @@ void board_add_piece(struct Board *b, struct Piece *p)
     glBindBuffer(GL_ARRAY_BUFFER, b->vb);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * b->nverts, 0, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void board_make_borders(struct Board *b)
+{
+    size_t ncubes = 10 + 20 * 2;
+    struct Cube **cubes = malloc(sizeof(struct Cube*) * ncubes);
+    size_t index = 0;
+
+    for (size_t i = 0; i < 20; ++i)
+    {
+        b->layout[i * 12] = '#';
+        cubes[index++] = cube_alloc((vec3){ 0.f, i, 0.f }, (vec3){ 1.f, 1.f, 1.f });
+
+        b->layout[i * 12 + 11] = '#';
+        cubes[index++] = cube_alloc((vec3){ 0.f, i, 11.f }, (vec3){ 1.f, 1.f, 1.f });
+    }
+
+    for (size_t i = 0; i < 10; ++i)
+    {
+        b->layout[((12 * 20 - 1) - 12) + (i + 2)] = '#';
+        cubes[index++] = cube_alloc((vec3){ 0.f, 0.f, i + 1 }, (vec3){ 1.f, 1.f, 1.f });
+    }
+
+    /* for (size_t i = 0; i < 12 * 20; ++i) */
+    /* { */
+    /*     if (i % 12 == 0) putchar('\n'); */
+    /*     putchar(b->layout[i]); */
+    /* } */
+
+    /* putchar('\n'); */
+
+    struct Piece *p = piece_alloc(cubes, ncubes);
+    board_add_piece(b, p);
 }

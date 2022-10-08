@@ -55,13 +55,6 @@ void prog_game(struct Prog *p)
 
     struct Board *board = board_alloc();
 
-    struct Cube **cubes = malloc(sizeof(struct Cube*));
-    cubes[0] = cube_alloc((vec3){ 5.f, 0.f, 0.f }, (vec3){ 1.f, 0.f, 0.f });
-
-    struct Piece *piece = piece_alloc(cubes, 1);
-    board_add_piece(board, piece);
-    board_fill_verts(board);
-
     while (p->running)
     {
         if (glfwWindowShouldClose(p->win))
@@ -79,7 +72,7 @@ void prog_game(struct Prog *p)
         shader_mat4(p->ri->shader, "model", model);
 
         board_render(board, p->ri);
-        piece_move(piece, (vec3){ 0.f, .01f, .02f });
+        // piece_move(piece, (vec3){ 0.f, .01f, .02f });
 
         // glDrawArrays(GL_TRIANGLES, 0, 3);
 

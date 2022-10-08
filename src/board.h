@@ -25,4 +25,6 @@ size_t board_fill_verts(struct Board *b);
 
 void board_add_piece(struct Board *b, struct Piece *p);
 
+void board_make_borders(struct Board *b);
+
 #endif
