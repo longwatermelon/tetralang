@@ -62,7 +62,7 @@ void ri_use_shader(RenderInfo *ri, int i)
     glUseProgram(ri->shader);
 }
 
-void ri_render_image(RenderInfo *ri, struct Texture *tex, int x, int y, int w, int h)
+void ri_render_image(RenderInfo *ri, struct Texture *tex, int x, int y, int w, int h, vec2 translate, vec2 scale)
 {
     int lx = x;
     int ly = y;
@@ -71,6 +71,9 @@ void ri_render_image(RenderInfo *ri, struct Texture *tex, int x, int y, int w, i
 
     shader_int(ri->shader, "image", 0);
     tex_bind(tex, 0);
+
+    shader_vec2(ri->shader, "translation", translate);
+    shader_vec2(ri->shader, "scale", scale);
 
     float cx = SCRW / 2.f;
     float cy = SCRH / 2.f;

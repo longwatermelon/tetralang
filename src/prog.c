@@ -169,45 +169,6 @@ void prog_game(struct Prog *p)
 void prog_title(struct Prog *p)
 {
     stbi_set_flip_vertically_on_load(true);
-    float verts[] = {
-        -1.f, -1.f, 0.f, 0.f,
-        -1.f, 1.f, 0.f, 1.f,
-        1.f, 1.f, 1.f, 1.f,
-
-        -1.f, -1.f, 0.f, 0.f,
-        1.f, -1.f, 1.f, 0.f,
-        1.f, 1.f, 1.f, 1.f
-    };
-
-    float bw = .4f;
-    float bh = .25f;
-
-    float bw2 = bw / 2.f;
-    float bh2 = bh / 2.f;
-
-    float bverts[] = {
-        -bw2, -bh2, 0.f, 0.f,
-        -bw2, bh2, 0.f, 1.f,
-        bw2, bh2, 1.f, 1.f,
-
-        -bw2, -bh2, 0.f, 0.f,
-        bw2, -bh2, 1.f, 0.f,
-        bw2, bh2, 1.f, 1.f
-    };
-
-    unsigned int vao, vb;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    glGenBuffers(1, &vb);
-    glBindBuffer(GL_ARRAY_BUFFER, vb);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-    glEnableVertexAttribArray(1);
 
     struct Texture *bg = tex_alloc("res/title.jpg");
     struct Texture *btn = tex_alloc("res/start.jpg");
@@ -228,12 +189,8 @@ void prog_title(struct Prog *p)
         double mx, my;
         glfwGetCursorPos(p->win, &mx, &my);
 
-        float lx = (SCRW / 2.f) - (bw2 / 2.f) * SCRW;
-        float ux = (SCRW / 2.f) + (bw2 / 2.f) * SCRW;
-        float ly = (SCRH / 2.f) - (bh2 / 2.f) * SCRH;
-        float uy = (SCRH / 2.f) + (bh2 / 2.f) * SCRH;
-
-        if (mx >= lx && mx <= ux && my >= ly && my <= uy)
+        if (mx >= SCRW / 2.f - 100.f && mx <= SCRW / 2.f + 100.f &&
+            my >= SCRH / 2.f - 50.f && my <= SCRH / 2.f + 50.f)
         {
             if (glfwGetMouseButton(p->win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
             {
@@ -256,29 +213,8 @@ void prog_title(struct Prog *p)
         glClear(GL_COLOR_BUFFER_BIT);
 
         ri_use_shader(p->ri, SHADER_IMAGE);
-        shader_int(p->ri->shader, "image", 0);
-
-        vec2 translation = { 0.f, 0.f }, scale = { 1.f, 1.f };
-        shader_vec2(p->ri->shader, "translation", translation);
-        shader_vec2(p->ri->shader, "scale", scale);
-
-        tex_bind(bg, 0);
-
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vb);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), verts);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        tex_bind(btn, 0);
-        scale[0] = 1.f + expand;
-        scale[1] = 1.f + expand;
-        shader_vec2(p->ri->shader, "scale", scale);
-
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(bverts), bverts);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        ri_render_image(p->ri, btn, 0, 0, 100, 200);
-        ri_render_image(p->ri, btn, 100, 10, 100, 200);
+        ri_render_image(p->ri, bg, 0, 0, SCRW, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        ri_render_image(p->ri, btn, SCRW / 2.f - 100.f, SCRH / 2.f - 50.f, 200, 100, (vec2){ 0.f, 0.f }, (vec2){ 1.f + expand, 1.f + expand });
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
@@ -286,7 +222,4 @@ void prog_title(struct Prog *p)
 
     tex_free(btn);
     tex_free(bg);
-
-    glDeleteBuffers(1, &vb);
-    glDeleteVertexArrays(1, &vao);
 }

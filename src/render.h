@@ -30,6 +30,6 @@ void ri_add_shader(RenderInfo *ri, ShaderType type, const char *vert, const char
 void ri_use_shader(RenderInfo *ri, int i);
 
 // Call shader for image beforehand
-void ri_render_image(RenderInfo *ri, struct Texture *tex, int x, int y, int w, int h);
+void ri_render_image(RenderInfo *ri, struct Texture *tex, int x, int y, int w, int h, vec2 translate, vec2 scale);
 
 #endif
