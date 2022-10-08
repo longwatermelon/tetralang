@@ -1,11 +1,13 @@
 #include "render.h"
+#include "cglm/vec2.h"
 #include "shader.h"
 #include "util.h"
 #include "texture.h"
 #include <glad/glad.h>
 
 // Image rendering
-unsigned int g_vao, g_vb;
+static unsigned int g_vao, g_vb;
+static vec2 g_tc_max, g_tc_min;
 
 RenderInfo *ri_alloc()
 {
@@ -30,6 +32,11 @@ RenderInfo *ri_alloc()
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    g_tc_max[0] = 1.f;
+    g_tc_max[1] = 1.f;
+    g_tc_min[0] = 0.f;
+    g_tc_min[1] = 0.f;
 
     return ri;
 }
@@ -62,6 +69,7 @@ void ri_use_shader(RenderInfo *ri, int i)
     glUseProgram(ri->shader);
 }
 
+
 void ri_render_image(RenderInfo *ri, struct Texture *tex, int x, int y, int w, int h, vec2 translate, vec2 scale)
 {
     int lx = x;
@@ -84,13 +92,13 @@ void ri_render_image(RenderInfo *ri, struct Texture *tex, int x, int y, int w, i
     float duy = (uy - cy) / cy;
 
     float verts[] = {
-        dlx, dly, 0.f, 0.f,
-        dlx, duy, 0.f, 1.f,
-        dux, duy, 1.f, 1.f,
+        dlx, dly, g_tc_min[0], g_tc_min[1],
+        dlx, duy, g_tc_min[0], g_tc_max[1],
+        dux, duy, g_tc_max[0], g_tc_max[1],
 
-        dlx, dly, 0.f, 0.f,
-        dux, dly, 1.f, 0.f,
-        dux, duy, 1.f, 1.f
+        dlx, dly, g_tc_min[0], g_tc_min[1],
+        dux, dly, g_tc_max[0], g_tc_min[1],
+        dux, duy, g_tc_max[0], g_tc_max[1]
     };
 
     glBindVertexArray(g_vao);
@@ -101,4 +109,10 @@ void ri_render_image(RenderInfo *ri, struct Texture *tex, int x, int y, int w, i
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void ri_set_image_tc(vec2 min, vec2 max)
+{
+    glm_vec2_copy(min, g_tc_min);
+    glm_vec2_copy(max, g_tc_max);
 }

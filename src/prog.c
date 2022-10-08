@@ -64,6 +64,8 @@ struct Prog *prog_alloc(GLFWwindow *win)
     glm_vec3_zero(p->shake);
     p->shake_begin = -100.f;
 
+    p->board = 0;
+
     g_prog = p;
     return p;
 }
@@ -95,6 +97,7 @@ void prog_game(struct Prog *p)
     struct Texture *norm_map = tex_alloc("res/normal.jpg");
 
     struct Texture *qbg = tex_alloc("res/qbg.png");
+    struct Texture *questions = tex_alloc("res/questions.png");
 
     while (p->running)
     {
@@ -151,6 +154,8 @@ void prog_game(struct Prog *p)
         glfwSwapBuffers(p->win);
         glfwPollEvents();
     }
+
+    tex_free(qbg);
 
     board_free(p->board);
 

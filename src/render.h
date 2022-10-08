@@ -31,5 +31,6 @@ void ri_use_shader(RenderInfo *ri, int i);
 
 // Call shader for image beforehand
 void ri_render_image(RenderInfo *ri, struct Texture *tex, int x, int y, int w, int h, vec2 translate, vec2 scale);
+void ri_set_image_tc(vec2 min, vec2 max);
 
 #endif
