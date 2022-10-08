@@ -258,17 +258,19 @@ void prog_title(struct Prog *p)
         ri_use_shader(p->ri, SHADER_IMAGE);
         shader_int(p->ri->shader, "image", 0);
 
-        vec2 translation = { 0.f, 0.f };
+        vec2 translation = { 0.f, 0.f }, scale = { 1.f, 1.f };
         shader_vec2(p->ri->shader, "translation", translation);
+        shader_vec2(p->ri->shader, "scale", scale);
 
         tex_bind(bg, 0);
-        shader_float(p->ri->shader, "scale", 0.f);
 
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), verts);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         tex_bind(btn, 0);
-        shader_float(p->ri->shader, "scale", expand);
+        scale[0] = 1.f + expand;
+        scale[1] = 1.f + expand;
+        shader_vec2(p->ri->shader, "scale", scale);
 
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(bverts), bverts);
         glDrawArrays(GL_TRIANGLES, 0, 6);
