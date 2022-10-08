@@ -85,23 +85,6 @@ void prog_game(struct Prog *p)
 
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
-    // float verts[] = {
-    //     2.f, 0.f, 0.f,
-    //     2.f, -1.f, 0.f,
-    //     2.f, -1.f, 1.f
-    // };
-
-    // unsigned int vao, vb;
-    // glGenVertexArrays(1, &vao);
-    // glBindVertexArray(vao);
-
-    // glGenBuffers(1, &vb);
-    // glBindBuffer(GL_ARRAY_BUFFER, vb);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-    // glEnableVertexAttribArray(0);
-
     mat4 view;
     glm_look((vec3){ 0.f, 0.f, 0.f }, (vec3){ 1.f, 0.f, 0.f }, (vec3){ 0.f, 1.f, 0.f }, view);
 
@@ -152,9 +135,6 @@ void prog_game(struct Prog *p)
         glBindTexture(GL_TEXTURE_2D, norm_map->id);
 
         board_render(p->board, p->ri);
-        // piece_move(piece, (vec3){ 0.f, .01f, .02f });
-
-        // glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
