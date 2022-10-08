@@ -2,6 +2,7 @@
 #define PROG_H
 
 #include "render.h"
+#include "board.h"
 #include <stdbool.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -12,6 +13,8 @@ struct Prog
     GLFWwindow *win;
 
     RenderInfo *ri;
+
+    struct Board *board;
 };
 
 struct Prog *prog_alloc(GLFWwindow *win);
