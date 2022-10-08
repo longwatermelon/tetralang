@@ -309,7 +309,11 @@ void prog_load_questions(struct Prog *p)
         QUESTION("f_ta.png", 4),
         QUESTION("ni.png", 2),
         QUESTION("shi.png", 2),
-        QUESTION("bu.png", 4)
+        QUESTION("bu.png", 4),
+        QUESTION("da.png", 1),
+        QUESTION("ren.png", 4),
+        QUESTION("xiao.png", 2),
+        QUESTION("liang.png", 3)
     };
 
     p->nquestions = sizeof(questions) / sizeof(struct Question*);
