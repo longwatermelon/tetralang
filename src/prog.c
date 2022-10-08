@@ -1,5 +1,7 @@
 #include "prog.h"
+#include "cglm/mat4.h"
 #include "render.h"
+#include "shader.h"
 #include "util.h"
 #include <stdlib.h>
 
@@ -23,15 +25,15 @@ void prog_free(struct Prog *p)
 
 void prog_game(struct Prog *p)
 {
-    // glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
     float verts[] = {
-        -1.f, -1.f, 1.f,
-        -1.f, 1.f, 1.f,
-        1.f, 1.f, 1.f
+        2.f, 0.f, 0.f,
+        2.f, -1.f, 0.f,
+        2.f, -1.f, 1.f
     };
 
     unsigned int vao, vb;
@@ -45,6 +47,9 @@ void prog_game(struct Prog *p)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
     glEnableVertexAttribArray(0);
 
+    mat4 view;
+    glm_look((vec3){ 0.f, 0.f, 0.f }, (vec3){ 1.f, 0.f, 0.f }, (vec3){ 0.f, 1.f, 0.f }, view);
+
     while (p->running)
     {
         if (glfwWindowShouldClose(p->win))
@@ -54,6 +59,13 @@ void prog_game(struct Prog *p)
         glViewport(0, 0, SCRW, SCRH);
 
         ri_use_shader(p->ri, SHADER_TETRIS);
+        shader_mat4(p->ri->shader, "proj", p->ri->proj);
+        shader_mat4(p->ri->shader, "view", view);
+
+        mat4 model;
+        glm_mat4_identity(model);
+        shader_mat4(p->ri->shader, "model", model);
+
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(p->win);
