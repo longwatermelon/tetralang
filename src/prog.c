@@ -55,7 +55,7 @@ struct Prog *prog_alloc(GLFWwindow *win)
     p->ri = ri_alloc();
     ri_add_shader(p->ri, SHADER_TETRIS, "shaders/tetris.vert", "shaders/tetris.frag");
     ri_add_shader(p->ri, SHADER_SKYBOX, "shaders/skybox.vert", "shaders/skybox.frag");
-    ri_add_shader(p->ri, SHADER_TITLE, "shaders/title.vert", "shaders/title.frag");
+    ri_add_shader(p->ri, SHADER_IMAGE, "shaders/image.vert", "shaders/image.frag");
 
     p->skybox = skybox_alloc("res/skybox/");
 
@@ -251,17 +251,20 @@ void prog_title(struct Prog *p)
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        ri_use_shader(p->ri, SHADER_TITLE);
-        shader_int(p->ri->shader, "bg", 0);
+        ri_use_shader(p->ri, SHADER_IMAGE);
+        shader_int(p->ri->shader, "image", 0);
+
+        vec2 translation = { 0.f, 0.f };
+        shader_vec2(p->ri->shader, "translation", translation);
 
         tex_bind(bg, 0);
-        shader_float(p->ri->shader, "expand", 0.f);
+        shader_float(p->ri->shader, "scale", 0.f);
 
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), verts);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         tex_bind(btn, 0);
-        shader_float(p->ri->shader, "expand", expand);
+        shader_float(p->ri->shader, "scale", expand);
 
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(bverts), bverts);
         glDrawArrays(GL_TRIANGLES, 0, 6);
