@@ -173,7 +173,6 @@ void prog_game(struct Prog *p)
 
         glDisable(GL_CULL_FACE);
         ri_render_image(p->ri, p->questions[0]->tex, 0, SCRH - QHEIGHT, SCRW, QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
-        // ri_render_image(p->ri, qbg, 0, 0, SCRW, SCRH - QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
         glEnable(GL_CULL_FACE);
 
         glfwSwapBuffers(p->win);
