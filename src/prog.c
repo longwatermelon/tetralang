@@ -118,6 +118,10 @@ void prog_game(struct Prog *p)
         glm_mat4_identity(model);
         shader_mat4(p->ri->shader, "model", model);
 
+        shader_int(p->ri->shader, "skybox", 0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, p->skybox->tex);
+
         board_render(p->board, p->ri);
         // piece_move(piece, (vec3){ 0.f, .01f, .02f });
 
