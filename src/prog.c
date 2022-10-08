@@ -175,6 +175,22 @@ void prog_title(struct Prog *p)
         1.f, 1.f, 1.f, 1.f
     };
 
+    float bw = .4f;
+    float bh = .25f;
+
+    float bw2 = bw / 2.f;
+    float bh2 = bh / 2.f;
+
+    float bverts[] = {
+        -bw2, -bh2, 0.f, 0.f,
+        -bw2, bh2, 0.f, 1.f,
+        bw2, bh2, 1.f, 1.f,
+
+        -bw2, -bh2, 0.f, 0.f,
+        bw2, -bh2, 1.f, 0.f,
+        bw2, bh2, 1.f, 1.f
+    };
+
     unsigned int vao, vb;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -190,25 +206,72 @@ void prog_title(struct Prog *p)
     glEnableVertexAttribArray(1);
 
     struct Texture *bg = tex_alloc("res/title.jpg");
+    struct Texture *btn = tex_alloc("res/start.jpg");
+
+    float expand = 0.f;
+    bool pressed = false;
 
     bool running = true;
 
     while (running)
     {
-        if (glfwWindowShouldClose(p->win) || glfwGetKey(p->win, GLFW_KEY_SPACE) == GLFW_PRESS)
+        if (glfwWindowShouldClose(p->win))
+        {
             running = false;
-        
+            p->running = false;
+        }
+
+        double mx, my;
+        glfwGetCursorPos(p->win, &mx, &my);
+
+        float lx = (SCRW / 2.f) - (bw2 / 2.f) * SCRW;
+        float ux = (SCRW / 2.f) + (bw2 / 2.f) * SCRW;
+        float ly = (SCRH / 2.f) - (bh2 / 2.f) * SCRH;
+        float uy = (SCRH / 2.f) + (bh2 / 2.f) * SCRH;
+
+        if (mx >= lx && mx <= ux && my >= ly && my <= uy)
+        {
+            if (glfwGetMouseButton(p->win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+            {
+                expand += (-.1f - expand) / 3.f;
+                pressed = true;
+            }
+            else
+            {
+                expand += (.15f - expand) / 5.f;
+            }
+        }
+        else
+        {
+            expand += -expand / 5.f;
+        }
+
+        if (glfwGetMouseButton(p->win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE && pressed)
+            running = false;
+
         glClear(GL_COLOR_BUFFER_BIT);
 
         ri_use_shader(p->ri, SHADER_TITLE);
         shader_int(p->ri->shader, "bg", 0);
-        tex_bind(bg, 0);
 
+        tex_bind(bg, 0);
+        shader_float(p->ri->shader, "expand", 0.f);
+
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), verts);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        tex_bind(btn, 0);
+        shader_float(p->ri->shader, "expand", expand);
+
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(bverts), bverts);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
     }
+
+    tex_free(btn);
+    tex_free(bg);
 
     glDeleteBuffers(1, &vb);
     glDeleteVertexArrays(1, &vao);
