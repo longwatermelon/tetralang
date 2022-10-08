@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <cglm/cglm.h>
 
+struct Texture;
+
 typedef enum
 {
     SHADER_TETRIS,
@@ -26,5 +28,8 @@ void ri_free(RenderInfo *ri);
 
 void ri_add_shader(RenderInfo *ri, ShaderType type, const char *vert, const char *frag);
 void ri_use_shader(RenderInfo *ri, int i);
+
+// Call shader for image beforehand
+void ri_render_image(RenderInfo *ri, struct Texture *tex, int x, int y, int w, int h);
 
 #endif

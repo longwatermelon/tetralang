@@ -264,6 +264,8 @@ void prog_title(struct Prog *p)
 
         tex_bind(bg, 0);
 
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vb);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), verts);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -274,6 +276,9 @@ void prog_title(struct Prog *p)
 
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(bverts), bverts);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        ri_render_image(p->ri, btn, 0, 0, 100, 200);
+        ri_render_image(p->ri, btn, 100, 10, 100, 200);
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
