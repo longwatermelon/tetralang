@@ -108,9 +108,10 @@ void prog_game(struct Prog *p)
 
     struct Texture *norm_map = tex_alloc("res/normal.jpg");
 
-    stbi_set_flip_vertically_on_load(true);
-    struct Texture *qbg = tex_alloc("res/qbg.png");
-    stbi_set_flip_vertically_on_load(false);
+    {
+        float grey = 116.f / 255.f;
+        glClearColor(grey, grey, grey, 1.f);
+    }
 
     while (p->running)
     {
@@ -172,14 +173,14 @@ void prog_game(struct Prog *p)
 
         glDisable(GL_CULL_FACE);
         ri_render_image(p->ri, p->questions[0]->tex, 0, SCRH - QHEIGHT, SCRW, QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
-        ri_render_image(p->ri, qbg, 0, 0, SCRW, SCRH - QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        // ri_render_image(p->ri, qbg, 0, 0, SCRW, SCRH - QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
         glEnable(GL_CULL_FACE);
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
     }
 
-    tex_free(qbg);
+    // tex_free(qbg);
 
     board_free(p->board);
 
@@ -190,9 +191,12 @@ void prog_game(struct Prog *p)
 void prog_title(struct Prog *p)
 {
     stbi_set_flip_vertically_on_load(true);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     struct Texture *bg = tex_alloc("res/title.jpg");
-    struct Texture *btn = tex_alloc("res/start.jpg");
+    struct Texture *btn = tex_alloc("res/start_button.png");
+    struct Texture *btn_hover = tex_alloc("res/start_button_hover.png");
 
     float expand = 0.f;
     bool pressed = false;
@@ -210,6 +214,8 @@ void prog_title(struct Prog *p)
         double mx, my;
         glfwGetCursorPos(p->win, &mx, &my);
 
+        bool hover = false;
+
         if (mx >= SCRW / 2.f - 100.f && mx <= SCRW / 2.f + 100.f &&
             my >= SCRH / 2.f - 50.f && my <= SCRH / 2.f + 50.f)
         {
@@ -222,6 +228,8 @@ void prog_title(struct Prog *p)
             {
                 expand += (.15f - expand) / 5.f;
             }
+
+            hover = true;
         }
         else
         {
@@ -235,12 +243,15 @@ void prog_title(struct Prog *p)
 
         ri_use_shader(p->ri, SHADER_IMAGE);
         ri_render_image(p->ri, bg, 0, 0, SCRW, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
-        ri_render_image(p->ri, btn, SCRW / 2.f - 100.f, SCRH / 2.f - 50.f, 200, 100, (vec2){ 0.f, 0.f }, (vec2){ 1.f + expand, 1.f + expand });
+        ri_render_image(p->ri, hover ? btn_hover : btn, SCRW / 2.f - 100.f, SCRH / 2.f - 50.f, 200, 100, (vec2){ 0.f, 0.f }, (vec2){ 1.f + expand, 1.f + expand });
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
     }
 
+    tex_free(btn_hover);
     tex_free(btn);
     tex_free(bg);
+
+    glDisable(GL_BLEND);
 }
