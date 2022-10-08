@@ -92,6 +92,8 @@ void prog_free(struct Prog *p)
 
 void prog_game(struct Prog *p)
 {
+    stbi_set_flip_vertically_on_load(true);
+    struct Texture *checkmark = tex_alloc("res/check.png");
     stbi_set_flip_vertically_on_load(false);
     glfwSetKeyCallback(p->win, key_callback);
 
@@ -114,6 +116,11 @@ void prog_game(struct Prog *p)
         glClearColor(grey, grey, grey, 1.f);
     }
 
+    float last_submit = -100.f;
+    float check_expand = 1.f;
+    float check_expand_vel = .1f;
+    float check_expand_acc = -.01f;
+
     while (p->running)
     {
         if (glfwWindowShouldClose(p->win))
@@ -124,9 +131,15 @@ void prog_game(struct Prog *p)
         if (p->board->last_cleared)
         {
             if (p->board->last_cleared == p->questions[p->curr_q]->answer)
+            {
                 printf("Correct\n");
+                last_submit = glfwGetTime();
+            }
             else
-                printf("Incorrect\n");
+            {
+                printf("Wrong\n");
+                last_submit = glfwGetTime();
+            }
 
             p->curr_q = rand() % p->nquestions;
             p->board->last_cleared = 0;
@@ -169,6 +182,32 @@ void prog_game(struct Prog *p)
 
         board_render(p->board, p->ri);
 
+        // Game checkmark
+        if (glfwGetTime() - last_submit < .5f)
+        {
+            check_expand += check_expand_vel;
+            check_expand_vel += check_expand_acc;
+            if (check_expand < 0.f)
+            {
+                last_submit = -100.f;
+                check_expand = 1.f;
+                check_expand_vel = .1f;
+            }
+            else
+            {
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+                glViewport(0, 0, SCRW, SCRH);
+                ri_use_shader(p->ri, SHADER_IMAGE);
+                glDisable(GL_CULL_FACE);
+                ri_render_image(p->ri, checkmark, SCRW / 2.f - 50.f, SCRH / 2.f - 50.f, 100.f, 100.f, (vec2){ -QWIDTH / SCRW, 0.f }, (vec2){ check_expand, check_expand });
+                glEnable(GL_CULL_FACE);
+
+                glDisable(GL_BLEND);
+            }
+        }
+
         // Questions
         ri_use_shader(p->ri, SHADER_IMAGE);
         glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
@@ -181,6 +220,8 @@ void prog_game(struct Prog *p)
         glfwPollEvents();
     }
 
+    tex_free(checkmark);
+    tex_free(norm_map);
     board_free(p->board);
 
     glDisable(GL_DEPTH_TEST);
