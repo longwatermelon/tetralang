@@ -17,6 +17,9 @@ struct Prog
 
     struct Board *board;
     struct Skybox *skybox;
+
+    vec3 shake;
+    float shake_begin;
 };
 
 struct Prog *prog_alloc(GLFWwindow *win);

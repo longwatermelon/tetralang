@@ -35,6 +35,7 @@ static void key_callback(GLFWwindow *win, int key, int scancode, int action, int
                 ;
 
             g_prog->board->last_moved = glfwGetTime() - .5f;
+            g_prog->shake_begin = glfwGetTime();
         }
 
         if (key == GLFW_KEY_C)
@@ -55,6 +56,9 @@ struct Prog *prog_alloc(GLFWwindow *win)
     ri_add_shader(p->ri, SHADER_SKYBOX, "shaders/skybox.vert", "shaders/skybox.frag");
 
     p->skybox = skybox_alloc("res/skybox/");
+
+    glm_vec3_zero(p->shake);
+    p->shake_begin = -100.f;
 
     g_prog = p;
     return p;
@@ -106,6 +110,17 @@ void prog_game(struct Prog *p)
             p->running = false;
 
         board_update(p->board);
+
+        if (glfwGetTime() - p->shake_begin < .05f)
+        {
+            p->shake[1] = (float)(rand() % 100 - 50) / 300.f;
+            p->shake[2] = (float)(rand() % 100 - 50) / 300.f;
+            glm_look(p->shake, (vec3){ 1.f, 0.f, 0.f }, (vec3){ 0.f, 1.f, 0.f }, view);
+        }
+        else
+        {
+            glm_look((vec3){ 0.f, 0.f, 0.f }, (vec3){ 1.f, 0.f, 0.f }, (vec3){ 0.f, 1.f, 0.f }, view);
+        }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, SCRW, SCRH);
