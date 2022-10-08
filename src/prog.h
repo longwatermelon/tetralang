@@ -1,6 +1,7 @@
 #ifndef PROG_H
 #define PROG_H
 
+#include "render.h"
 #include <stdbool.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -9,6 +10,8 @@ struct Prog
 {
     bool running;
     GLFWwindow *win;
+
+    RenderInfo *ri;
 };
 
 struct Prog *prog_alloc(GLFWwindow *win);

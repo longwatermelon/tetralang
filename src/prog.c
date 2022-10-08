@@ -8,11 +8,14 @@ struct Prog *prog_alloc(GLFWwindow *win)
     p->running = true;
     p->win = win;
 
+    p->ri = ri_alloc();
+
     return p;
 }
 
 void prog_free(struct Prog *p)
 {
+    ri_free(p->ri);
     free(p);
 }
 
