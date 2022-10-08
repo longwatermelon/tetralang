@@ -52,6 +52,8 @@ struct Board *board_alloc()
     b->next_piece = rand() % 7;
     board_make_borders(b);
 
+    b->last_cleared = 0;
+
     return b;
 }
 
@@ -266,6 +268,8 @@ void board_clear_full_lines(struct Board *b)
                 b->layout[i] = '#';
         }
     }
+
+    b->last_cleared = cleared;
 }
 
 void board_add_piece(struct Board *b, struct Piece *p)

@@ -1,6 +1,7 @@
 #include "prog.h"
 #include "cube.h"
 #include "piece.h"
+#include "question.h"
 #include "render.h"
 #include "shader.h"
 #include "board.h"
@@ -14,7 +15,8 @@
 
 struct Prog *g_prog;
 
-#define QWIDTH 300
+#define QWIDTH 400
+#define QHEIGHT 240
 
 static void key_callback(GLFWwindow *win, int key, int scancode, int action, int mods)
 {
@@ -66,12 +68,22 @@ struct Prog *prog_alloc(GLFWwindow *win)
 
     p->board = 0;
 
+    p->questions = 0;
+    p->nquestions = 0;
+
+    p->questions = malloc(sizeof(struct Question*));
+    p->questions[0] = question_alloc("res/questions/question.png", 1);
+
     g_prog = p;
     return p;
 }
 
 void prog_free(struct Prog *p)
 {
+    for (size_t i = 0; i < p->nquestions; ++i)
+        question_free(p->questions[i]);
+    free(p->questions);
+
     ri_free(p->ri);
     skybox_free(p->skybox);
     free(p);
@@ -96,8 +108,9 @@ void prog_game(struct Prog *p)
 
     struct Texture *norm_map = tex_alloc("res/normal.jpg");
 
+    stbi_set_flip_vertically_on_load(true);
     struct Texture *qbg = tex_alloc("res/qbg.png");
-    struct Texture *questions = tex_alloc("res/questions.png");
+    stbi_set_flip_vertically_on_load(false);
 
     while (p->running)
     {
@@ -105,6 +118,16 @@ void prog_game(struct Prog *p)
             p->running = false;
 
         board_update(p->board);
+
+        if (p->board->last_cleared)
+        {
+            if (p->board->last_cleared == p->questions[0]->answer)
+                printf("Correct\n");
+            else
+                printf("Incorrect\n");
+
+            p->board->last_cleared = 0;
+        }
 
         if (glfwGetTime() - p->shake_begin < .05f)
         {
@@ -145,10 +168,10 @@ void prog_game(struct Prog *p)
 
         // Questions
         ri_use_shader(p->ri, SHADER_IMAGE);
-        glViewport(0, 0, SCRW, SCRH);
+        glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
 
         glDisable(GL_CULL_FACE);
-        ri_render_image(p->ri, qbg, SCRW - QWIDTH, 0, QWIDTH, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        ri_render_image(p->ri, p->questions[0]->tex, 0, SCRH - QHEIGHT, SCRW, QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
         glEnable(GL_CULL_FACE);
 
         glfwSwapBuffers(p->win);

@@ -4,6 +4,7 @@
 #include "render.h"
 #include "board.h"
 #include "skybox.h"
+#include "question.h"
 #include <stdbool.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -20,6 +21,9 @@ struct Prog
 
     vec3 shake;
     float shake_begin;
+
+    struct Question **questions;
+    size_t nquestions;
 };
 
 struct Prog *prog_alloc(GLFWwindow *win);

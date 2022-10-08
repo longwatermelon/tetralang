@@ -24,6 +24,8 @@ struct Board
     bool can_hold;
 
     int next_piece;
+
+    int last_cleared;
 };
 
 struct Board *board_alloc();
