@@ -24,6 +24,7 @@ struct Prog
 
     struct Question **questions;
     size_t nquestions;
+    size_t curr_q;
 };
 
 struct Prog *prog_alloc(GLFWwindow *win);
@@ -31,5 +32,7 @@ void prog_free(struct Prog *p);
 
 void prog_game(struct Prog *p);
 void prog_title(struct Prog *p);
+
+void prog_load_questions(struct Prog *p);
 
 #endif

@@ -71,8 +71,9 @@ struct Prog *prog_alloc(GLFWwindow *win)
     p->questions = 0;
     p->nquestions = 0;
 
-    p->questions = malloc(sizeof(struct Question*));
-    p->questions[0] = question_alloc("res/questions/question.png", 1);
+    prog_load_questions(p);
+
+    p->curr_q = rand() % p->nquestions;
 
     g_prog = p;
     return p;
@@ -122,11 +123,12 @@ void prog_game(struct Prog *p)
 
         if (p->board->last_cleared)
         {
-            if (p->board->last_cleared == p->questions[0]->answer)
+            if (p->board->last_cleared == p->questions[p->curr_q]->answer)
                 printf("Correct\n");
             else
                 printf("Incorrect\n");
 
+            p->curr_q = rand() % p->nquestions;
             p->board->last_cleared = 0;
         }
 
@@ -172,14 +174,12 @@ void prog_game(struct Prog *p)
         glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
 
         glDisable(GL_CULL_FACE);
-        ri_render_image(p->ri, p->questions[0]->tex, 0, SCRH - QHEIGHT, SCRW, QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        ri_render_image(p->ri, p->questions[p->curr_q]->tex, 0, SCRH - QHEIGHT, SCRW, QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
         glEnable(GL_CULL_FACE);
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
     }
-
-    // tex_free(qbg);
 
     board_free(p->board);
 
@@ -253,4 +253,20 @@ void prog_title(struct Prog *p)
     tex_free(bg);
 
     glDisable(GL_BLEND);
+}
+
+#define QUESTION(s, a) question_alloc("res/questions/" s, a)
+
+void prog_load_questions(struct Prog *p)
+{
+    struct Question *questions[] = {
+        QUESTION("wo.png", 1),
+        QUESTION("m_ta.png", 3)
+    };
+
+    p->nquestions = sizeof(questions) / sizeof(struct Question*);
+    p->questions = malloc(sizeof(struct Question*) * p->nquestions);
+
+    for (size_t i = 0; i < p->nquestions; ++i)
+        p->questions[i] = questions[i];
 }
