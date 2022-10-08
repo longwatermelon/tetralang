@@ -3,6 +3,7 @@
 
 #include "render.h"
 #include "board.h"
+#include "skybox.h"
 #include <stdbool.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -15,6 +16,7 @@ struct Prog
     RenderInfo *ri;
 
     struct Board *board;
+    struct Skybox *skybox;
 };
 
 struct Prog *prog_alloc(GLFWwindow *win);

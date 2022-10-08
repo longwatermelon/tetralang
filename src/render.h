@@ -6,7 +6,8 @@
 
 typedef enum
 {
-    SHADER_TETRIS
+    SHADER_TETRIS,
+    SHADER_SKYBOX
 } ShaderType;
 
 typedef struct

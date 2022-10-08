@@ -5,6 +5,7 @@
 #include "render.h"
 #include "shader.h"
 #include "board.h"
+#include "skybox.h"
 #include "util.h"
 #include <stdlib.h>
 #include <cglm/cglm.h>
@@ -50,6 +51,9 @@ struct Prog *prog_alloc(GLFWwindow *win)
 
     p->ri = ri_alloc();
     ri_add_shader(p->ri, SHADER_TETRIS, "shaders/tetris.vert", "shaders/tetris.frag");
+    ri_add_shader(p->ri, SHADER_SKYBOX, "shaders/skybox.vert", "shaders/skybox.frag");
+
+    p->skybox = skybox_alloc("res/skybox/");
 
     g_prog = p;
     return p;
@@ -58,6 +62,7 @@ struct Prog *prog_alloc(GLFWwindow *win)
 void prog_free(struct Prog *p)
 {
     ri_free(p->ri);
+    skybox_free(p->skybox);
     free(p);
 }
 
@@ -101,6 +106,9 @@ void prog_game(struct Prog *p)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, SCRW, SCRH);
+
+        ri_use_shader(p->ri, SHADER_SKYBOX);
+        skybox_render(p->skybox, p->ri);
 
         ri_use_shader(p->ri, SHADER_TETRIS);
         shader_mat4(p->ri->shader, "proj", p->ri->proj);
