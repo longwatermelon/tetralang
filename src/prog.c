@@ -110,7 +110,7 @@ void prog_game(struct Prog *p)
     struct Texture *norm_map = tex_alloc("res/normal.jpg");
 
     {
-        float grey = 116.f / 255.f;
+        float grey = 100.f / 255.f;
         glClearColor(grey, grey, grey, 1.f);
     }
 
@@ -261,7 +261,11 @@ void prog_load_questions(struct Prog *p)
 {
     struct Question *questions[] = {
         QUESTION("wo.png", 1),
-        QUESTION("m_ta.png", 3)
+        QUESTION("m_ta.png", 3),
+        QUESTION("f_ta.png", 4),
+        QUESTION("ni.png", 2),
+        QUESTION("shi.png", 2),
+        QUESTION("bu.png", 4)
     };
 
     p->nquestions = sizeof(questions) / sizeof(struct Question*);
