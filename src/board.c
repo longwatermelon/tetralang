@@ -113,7 +113,7 @@ void board_render(struct Board *b, RenderInfo *ri)
 
     mat4 model;
     glm_mat4_identity(model);
-    glm_translate(model, (vec3){ 30.f, -10.f, -4.5f });
+    glm_translate(model, (vec3){ 30.f, -10.f, -5.5f });
     shader_mat4(ri->shader, "model", model);
 
     glBindVertexArray(b->vao);

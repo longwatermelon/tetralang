@@ -112,16 +112,11 @@ void prog_game(struct Prog *p)
     mat4 view;
     glm_look((vec3){ 0.f, 0.f, 0.f }, (vec3){ 1.f, 0.f, 0.f }, (vec3){ 0.f, 1.f, 0.f }, view);
 
-    glm_perspective(glm_rad(45.f), (SCRW - QWIDTH) / SCRH, .1f, 1000.f, p->ri->proj);
-
     p->board = board_alloc();
 
     struct Texture *norm_map = tex_alloc("res/normal.jpg");
 
-    {
-        float grey = 100.f / 255.f;
-        glClearColor(grey, grey, grey, 1.f);
-    }
+    glClearColor(0.f, 0.f, 0.f, 1.f);
 
     float last_submit = glfwGetTime();
     float check_expand = 1.f;
@@ -131,7 +126,8 @@ void prog_game(struct Prog *p)
     bool show_checkmark = false;
 
     float question_view_time = 3.f;
-    vec4 qdefault_viewport = { SCRW - QWIDTH, SCRH - QHEIGHT, QWIDTH, QHEIGHT };
+    // vec4 qdefault_viewport = { SCRW - QWIDTH, SCRH - QHEIGHT, QWIDTH, QHEIGHT };
+    vec4 qdefault_viewport = { 0.f, 0.f, QWIDTH, QHEIGHT };
     vec4 center_viewport = { SCRW / 2.f - QWIDTH, SCRH / 2.f - QHEIGHT, QWIDTH * 2.f, QHEIGHT * 2.f };
     vec4 question_viewport;
     glm_vec4_copy(qdefault_viewport, question_viewport);
@@ -183,7 +179,7 @@ void prog_game(struct Prog *p)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Game
-        glViewport(0, 0, SCRW - QWIDTH, SCRH);
+        glViewport(0, 0, SCRW, SCRH);
 
         ri_use_shader(p->ri, SHADER_SKYBOX);
         skybox_render(p->skybox, p->ri);
@@ -225,7 +221,7 @@ void prog_game(struct Prog *p)
                 glViewport(0, 0, SCRW, SCRH);
                 ri_use_shader(p->ri, SHADER_IMAGE);
                 glDisable(GL_CULL_FACE);
-                ri_render_image(p->ri, submit_correct ? checkmark : cross, SCRW / 2.f - 50.f, SCRH / 2.f - 50.f, 100.f, 100.f, (vec2){ -QWIDTH / SCRW, 0.f }, (vec2){ check_expand, check_expand });
+                ri_render_image(p->ri, submit_correct ? checkmark : cross, SCRW / 2.f - 50.f, SCRH / 2.f - 50.f, 100.f, 100.f, (vec2){ 0.f, 0.f }, (vec2){ check_expand, check_expand });
                 glEnable(GL_CULL_FACE);
 
                 glDisable(GL_BLEND);
@@ -236,7 +232,7 @@ void prog_game(struct Prog *p)
         ri_use_shader(p->ri, SHADER_IMAGE);
         glViewport(question_viewport[0], question_viewport[1], question_viewport[2], question_viewport[3]);
 
-        if (glfwGetTime() - last_submit < question_view_time && glfwGetTime() - last_submit > .2f)
+        if (glfwGetTime() - last_submit < question_view_time && glfwGetTime() - last_submit > .4f)
         {
             question_viewport[0] += (center_viewport[0] - question_viewport[0]) / 8.f;
             question_viewport[1] += (center_viewport[1] - question_viewport[1]) / 8.f;
@@ -266,34 +262,34 @@ void prog_game(struct Prog *p)
         }
 
         // Ranking
-        {
-            glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
-            float ranking_text_w = 75.f * (SCRW / QWIDTH);
-            float resize = 1.3f;
-            float start_y = SCRH - QHEIGHT - 45.f;
+        // {
+        //     glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
+        //     float ranking_text_w = 75.f * (SCRW / QWIDTH);
+        //     float resize = 1.3f;
+        //     float start_y = SCRH - QHEIGHT - 45.f;
 
-            glEnable(GL_BLEND);
+        //     glEnable(GL_BLEND);
 
-            ri_render_image(p->ri, ranking_text, 0, start_y, ranking_text_w * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        //     ri_render_image(p->ri, ranking_text, 0, start_y, ranking_text_w * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
-            float tc_x = .2f;
+        //     float tc_x = .2f;
 
-            if (p->total != 0)
-            {
-                float percentage = (float)p->correct / p->total;
+        //     if (p->total != 0)
+        //     {
+        //         float percentage = (float)p->correct / p->total;
 
-                if (percentage >= .9f) tc_x = .2f;
-                else if (percentage >= .8f) tc_x = .4f;
-                else if (percentage >= .7f) tc_x = .6f;
-                else if (percentage >= .6f) tc_x = .8f;
-                else tc_x = 1.f;
-            }
-            ri_set_image_tc((vec2){ tc_x - .2f, 0.f }, (vec2){ tc_x, 1.f });
-            ri_render_image(p->ri, scores, ranking_text_w * resize + 10.f, start_y + 2.f, 18.f * (SCRW / QWIDTH) * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
-            ri_set_image_tc((vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        //         if (percentage >= .9f) tc_x = .2f;
+        //         else if (percentage >= .8f) tc_x = .4f;
+        //         else if (percentage >= .7f) tc_x = .6f;
+        //         else if (percentage >= .6f) tc_x = .8f;
+        //         else tc_x = 1.f;
+        //     }
+        //     ri_set_image_tc((vec2){ tc_x - .2f, 0.f }, (vec2){ tc_x, 1.f });
+        //     ri_render_image(p->ri, scores, ranking_text_w * resize + 10.f, start_y + 2.f, 18.f * (SCRW / QWIDTH) * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        //     ri_set_image_tc((vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
-            glDisable(GL_BLEND);
-        }
+        //     glDisable(GL_BLEND);
+        // }
 
         glEnable(GL_CULL_FACE);
 
