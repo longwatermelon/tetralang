@@ -2,7 +2,7 @@
 
 For Hackdemonium 2.0
 
-Can build on linux and osx, install mingw for windows to build
+Can build on linux and osx, unofficial windows support.
 
 # Building
 ```
