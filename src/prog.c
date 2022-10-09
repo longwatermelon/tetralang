@@ -252,44 +252,44 @@ void prog_game(struct Prog *p)
         //     ri_render_image(p->ri, p->questions[p->curr_q]->tex, 0, SCRH - QHEIGHT, SCRW, QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
         ri_render_image(p->ri, p->questions[p->curr_q]->tex, 0, 0, SCRW, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
-        // Bottom decoration
+        // Logo
         {
             glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
             glEnable(GL_BLEND);
-            // 1280x720
-            ri_render_image(p->ri, logo, (SCRW  - QWIDTH) / 2.f - 120.f, 70.f, 240.f * SCRW / QWIDTH, 240.f / 1280.f * 720.f, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+            // 1280x200
+            ri_render_image(p->ri, logo, (SCRW - QWIDTH) / 2.f - 130.f, SCRH - 100.f, 240.f * SCRW / QWIDTH, 240.f / 1280.f * 200.f, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
             glDisable(GL_BLEND);
         }
 
         // Ranking
-        // {
-        //     glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
-        //     float ranking_text_w = 75.f * (SCRW / QWIDTH);
-        //     float resize = 1.3f;
-        //     float start_y = SCRH - QHEIGHT - 45.f;
+        {
+            glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
+            float ranking_text_w = 75.f * (SCRW / QWIDTH);
+            float resize = 1.3f;
+            float start_y = SCRH - 150.f;
 
-        //     glEnable(GL_BLEND);
+            glEnable(GL_BLEND);
 
-        //     ri_render_image(p->ri, ranking_text, 0, start_y, ranking_text_w * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+            ri_render_image(p->ri, ranking_text, (SCRW - QWIDTH) / 2.f, start_y, ranking_text_w * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
-        //     float tc_x = .2f;
+            float tc_x = .2f;
 
-        //     if (p->total != 0)
-        //     {
-        //         float percentage = (float)p->correct / p->total;
+            if (p->total != 0)
+            {
+                float percentage = (float)p->correct / p->total;
 
-        //         if (percentage >= .9f) tc_x = .2f;
-        //         else if (percentage >= .8f) tc_x = .4f;
-        //         else if (percentage >= .7f) tc_x = .6f;
-        //         else if (percentage >= .6f) tc_x = .8f;
-        //         else tc_x = 1.f;
-        //     }
-        //     ri_set_image_tc((vec2){ tc_x - .2f, 0.f }, (vec2){ tc_x, 1.f });
-        //     ri_render_image(p->ri, scores, ranking_text_w * resize + 10.f, start_y + 2.f, 18.f * (SCRW / QWIDTH) * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
-        //     ri_set_image_tc((vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+                if (percentage >= .9f) tc_x = .2f;
+                else if (percentage >= .8f) tc_x = .4f;
+                else if (percentage >= .7f) tc_x = .6f;
+                else if (percentage >= .6f) tc_x = .8f;
+                else tc_x = 1.f;
+            }
+            ri_set_image_tc((vec2){ tc_x - .2f, 0.f }, (vec2){ tc_x, 1.f });
+            ri_render_image(p->ri, scores, (SCRW - QWIDTH) / 2.f + ranking_text_w * resize + 10.f, start_y + 2.f, 18.f * (SCRW / QWIDTH) * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+            ri_set_image_tc((vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
-        //     glDisable(GL_BLEND);
-        // }
+            glDisable(GL_BLEND);
+        }
 
         glEnable(GL_CULL_FACE);
 
@@ -367,7 +367,7 @@ void prog_title(struct Prog *p)
         ri_render_image(p->ri, bg, 0, 0, SCRW, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
         ri_render_image(p->ri, hover ? btn_hover : btn, SCRW / 2.f - 100.f, SCRH / 2.f - 50.f, 200, 100, (vec2){ 0.f, 0.f }, (vec2){ 1.f + expand, 1.f + expand });
         // 1280x720
-        ri_render_image(p->ri, title_art, SCRW / 2.f - 300.f, SCRH - 250.f, 600.f, 600.f / 1280.f * 720.f, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        ri_render_image(p->ri, title_art, SCRW / 2.f - 300.f, SCRH - 150.f, 600.f, 600.f / 1280.f * 200.f, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
