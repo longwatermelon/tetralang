@@ -75,6 +75,9 @@ struct Prog *prog_alloc(GLFWwindow *win)
 
     p->curr_q = rand() % p->nquestions;
 
+    p->correct = 0;
+    p->total = 0;
+
     g_prog = p;
     return p;
 }
@@ -95,6 +98,9 @@ void prog_game(struct Prog *p)
     stbi_set_flip_vertically_on_load(true);
     struct Texture *checkmark = tex_alloc("res/check.png");
     struct Texture *cross = tex_alloc("res/cross.png");
+
+    struct Texture *ranking_text = tex_alloc("res/ranking-text.png");
+    struct Texture *scores = tex_alloc("res/scores.png");
     stbi_set_flip_vertically_on_load(false);
     glfwSetKeyCallback(p->win, key_callback);
 
@@ -136,6 +142,7 @@ void prog_game(struct Prog *p)
             {
                 submit_correct = true;
                 last_submit = glfwGetTime();
+                ++p->correct;
             }
             else
             {
@@ -143,6 +150,7 @@ void prog_game(struct Prog *p)
                 last_submit = glfwGetTime();
             }
 
+            ++p->total;
             p->curr_q = rand() % p->nquestions;
             p->board->last_cleared = 0;
         }
@@ -216,12 +224,44 @@ void prog_game(struct Prog *p)
 
         glDisable(GL_CULL_FACE);
         ri_render_image(p->ri, p->questions[p->curr_q]->tex, 0, SCRH - QHEIGHT, SCRW, QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+
+        // Ranking
+        {
+            float ranking_text_w = 75.f * (SCRW / QWIDTH);
+            float resize = 1.3f;
+            float start_y = SCRH - QHEIGHT - 45.f;
+
+            glEnable(GL_BLEND);
+
+            ri_render_image(p->ri, ranking_text, 0, start_y, ranking_text_w * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+
+            float tc_x = .2f;
+
+            if (p->total != 0)
+            {
+                float percentage = (float)p->correct / p->total;
+
+                if (percentage >= .9f) tc_x = .2f;
+                else if (percentage >= .8f) tc_x = .4f;
+                else if (percentage >= .7f) tc_x = .6f;
+                else if (percentage >= .6f) tc_x = .8f;
+                else tc_x = 1.f;
+            }
+            ri_set_image_tc((vec2){ tc_x - .2f, 0.f }, (vec2){ tc_x, 1.f });
+            ri_render_image(p->ri, scores, ranking_text_w * resize + 10.f, start_y + 2.f, 18.f * (SCRW / QWIDTH) * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+            ri_set_image_tc((vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+
+            glDisable(GL_BLEND);
+        }
+
         glEnable(GL_CULL_FACE);
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
     }
 
+    tex_free(scores);
+    tex_free(ranking_text);
     tex_free(cross);
     tex_free(checkmark);
     tex_free(norm_map);

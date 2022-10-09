@@ -25,6 +25,8 @@ struct Prog
     struct Question **questions;
     size_t nquestions;
     size_t curr_q;
+
+    int correct, total;
 };
 
 struct Prog *prog_alloc(GLFWwindow *win);

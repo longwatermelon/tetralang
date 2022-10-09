@@ -28,7 +28,7 @@ void main()
 
     vec3 new_pos = f_pos - norm;
 
-    vec3 ambient = f_col * .2;
+    vec3 ambient = f_col * .4;
 
     vec3 ldir = vec3(-1., 0., 0.);
     float diff = max(dot(norm, ldir), 0.);
