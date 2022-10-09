@@ -266,11 +266,11 @@ void prog_game(struct Prog *p)
             glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
             float ranking_text_w = 75.f * (SCRW / QWIDTH);
             float resize = 1.3f;
-            float start_y = SCRH - 150.f;
+            float start_y = SCRH - 140.f;
 
             glEnable(GL_BLEND);
 
-            ri_render_image(p->ri, ranking_text, (SCRW - QWIDTH) / 2.f, start_y, ranking_text_w * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+            ri_render_image(p->ri, ranking_text, (SCRW - QWIDTH) / 2.f + 20.f, start_y, ranking_text_w * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
             float tc_x = .2f;
 
@@ -285,7 +285,7 @@ void prog_game(struct Prog *p)
                 else tc_x = 1.f;
             }
             ri_set_image_tc((vec2){ tc_x - .2f, 0.f }, (vec2){ tc_x, 1.f });
-            ri_render_image(p->ri, scores, (SCRW - QWIDTH) / 2.f + ranking_text_w * resize + 10.f, start_y + 2.f, 18.f * (SCRW / QWIDTH) * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+            ri_render_image(p->ri, scores, (SCRW - QWIDTH) / 2.f + ranking_text_w * resize + 30.f, start_y + 2.f, 18.f * (SCRW / QWIDTH) * resize, 18.f * resize, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
             ri_set_image_tc((vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
             glDisable(GL_BLEND);
