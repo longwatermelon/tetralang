@@ -101,13 +101,13 @@ void prog_game(struct Prog *p)
 
     struct Texture *ranking_text = tex_alloc("res/ranking-text.png");
     struct Texture *scores = tex_alloc("res/scores.png");
+
+    struct Texture *logo = tex_alloc("res/tetralang-title.png");
     stbi_set_flip_vertically_on_load(false);
     glfwSetKeyCallback(p->win, key_callback);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-
-    glClearColor(0.f, 0.f, 0.f, 1.f);
 
     mat4 view;
     glm_look((vec3){ 0.f, 0.f, 0.f }, (vec3){ 1.f, 0.f, 0.f }, (vec3){ 0.f, 1.f, 0.f }, view);
@@ -256,6 +256,15 @@ void prog_game(struct Prog *p)
         //     ri_render_image(p->ri, p->questions[p->curr_q]->tex, 0, SCRH - QHEIGHT, SCRW, QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
         ri_render_image(p->ri, p->questions[p->curr_q]->tex, 0, 0, SCRW, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
+        // Bottom decoration
+        {
+            glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
+            glEnable(GL_BLEND);
+            // 1280x720
+            ri_render_image(p->ri, logo, (SCRW  - QWIDTH) / 2.f - 120.f, 70.f, 240.f * SCRW / QWIDTH, 240.f / 1280.f * 720.f, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+            glDisable(GL_BLEND);
+        }
+
         // Ranking
         {
             glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
@@ -292,6 +301,7 @@ void prog_game(struct Prog *p)
         glfwPollEvents();
     }
 
+    tex_free(logo);
     tex_free(scores);
     tex_free(ranking_text);
     tex_free(cross);
@@ -312,6 +322,7 @@ void prog_title(struct Prog *p)
     struct Texture *bg = tex_alloc("res/title.jpg");
     struct Texture *btn = tex_alloc("res/start_button.png");
     struct Texture *btn_hover = tex_alloc("res/start_button_hover.png");
+    struct Texture *title_art = tex_alloc("res/tetralang-title.png");
 
     float expand = 0.f;
     bool pressed = false;
@@ -359,11 +370,14 @@ void prog_title(struct Prog *p)
         ri_use_shader(p->ri, SHADER_IMAGE);
         ri_render_image(p->ri, bg, 0, 0, SCRW, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
         ri_render_image(p->ri, hover ? btn_hover : btn, SCRW / 2.f - 100.f, SCRH / 2.f - 50.f, 200, 100, (vec2){ 0.f, 0.f }, (vec2){ 1.f + expand, 1.f + expand });
+        // 1280x720
+        ri_render_image(p->ri, title_art, SCRW / 2.f - 300.f, SCRH - 250.f, 600.f, 600.f / 1280.f * 720.f, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
     }
 
+    tex_free(title_art);
     tex_free(btn_hover);
     tex_free(btn);
     tex_free(bg);
