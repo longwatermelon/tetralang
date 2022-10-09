@@ -161,7 +161,11 @@ void prog_game(struct Prog *p)
             show_checkmark = true;
 
             ++p->total;
-            p->curr_q = rand() % p->nquestions;
+
+            size_t prev = p->curr_q;
+            while (p->curr_q == prev)
+                p->curr_q = rand() % p->nquestions;
+
             p->board->last_cleared = 0;
         }
 
@@ -374,12 +378,12 @@ void prog_load_questions(struct Prog *p)
     struct Question *questions[] = {
         QUESTION("wo.png", 1),
         QUESTION("m_ta.png", 3),
-        QUESTION("f_ta.png", 4),
+        QUESTION("f_ta.png", 1),
         QUESTION("ni.png", 2),
         QUESTION("shi.png", 2),
         QUESTION("bu.png", 4),
         QUESTION("da.png", 1),
-        QUESTION("ren.png", 4),
+        QUESTION("ren.png", 2),
         QUESTION("xiao.png", 2),
         QUESTION("liang.png", 3)
     };

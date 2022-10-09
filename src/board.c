@@ -80,7 +80,9 @@ void board_update(struct Board *b)
     {
         b->active = board_spawn_piece(b);
         b->last_moved = glfwGetTime();
-        b->next_piece = rand() % 7;
+        b->next_piece = rand() % 8 - 1;
+
+        if (b->next_piece < 0) b->next_piece = 0;
     }
 
     if (glfwGetTime() - b->last_moved > .5f)
