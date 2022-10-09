@@ -9,6 +9,7 @@
 #include "stb/stb_image.h"
 #include "util.h"
 #include "texture.h"
+#include <limits.h>
 #include <stdlib.h>
 #include <cglm/cglm.h>
 #include <GLFW/glfw3.h>
@@ -319,9 +320,15 @@ void prog_title(struct Prog *p)
     struct Texture *btn = tex_alloc("res/start_button.png");
     struct Texture *btn_hover = tex_alloc("res/start_button_hover.png");
     struct Texture *title_art = tex_alloc("res/tetralang-title.png");
+    struct Texture *help_btn = tex_alloc("res/help_button.png");
+    struct Texture *help_btn_hover = tex_alloc("res/help_button_hover.png");
+    struct Texture *help = tex_alloc("res/help.png");
 
     float expand = 0.f;
+    float help_expand = 0.f;
     bool pressed = false;
+    bool help_pressed = false;
+    bool display_help = false;
 
     bool running = true;
 
@@ -335,44 +342,91 @@ void prog_title(struct Prog *p)
 
         double mx, my;
         glfwGetCursorPos(p->win, &mx, &my);
+        my = SCRH - my;
 
         bool hover = false;
+        bool help_hover = false;
 
-        if (mx >= SCRW / 2.f - 100.f && mx <= SCRW / 2.f + 100.f &&
-            my >= SCRH / 2.f - 50.f && my <= SCRH / 2.f + 50.f)
+        if (!display_help)
         {
-            if (glfwGetMouseButton(p->win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+            if (mx >= SCRW / 2.f - 100.f && mx <= SCRW / 2.f + 100.f &&
+                my >= SCRH / 2.f - 50.f && my <= SCRH / 2.f + 50.f)
             {
-                expand += (-.1f - expand) / 3.f;
-                pressed = true;
+                if (glfwGetMouseButton(p->win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+                {
+                    expand += (-.1f - expand) / 3.f;
+                    pressed = true;
+                }
+                else
+                {
+                    expand += (.15f - expand) / 5.f;
+                }
+
+                hover = true;
             }
             else
             {
-                expand += (.15f - expand) / 5.f;
+                expand += -expand / 5.f;
             }
 
-            hover = true;
-        }
-        else
-        {
-            expand += -expand / 5.f;
+            if (mx >= SCRW / 2.f - 70.f && mx <= SCRW / 2.f + 70.f &&
+                my >= SCRH / 2.f - 110.f && my <= SCRH / 2.f - 110.f + 70.f)
+            {
+                if (glfwGetMouseButton(p->win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+                {
+                    help_pressed = true;
+                    help_expand += (-.1f - help_expand) / 3.f;
+                }
+                else
+                {
+                    help_expand += (.15f - help_expand) / 5.f;
+                }
+
+                help_hover = true;
+            }
+            else
+            {
+                help_expand -= help_expand / 5.f;
+            }
         }
 
         if (glfwGetMouseButton(p->win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE && pressed)
             running = false;
 
+        if (glfwGetMouseButton(p->win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE && help_pressed)
+        {
+            display_help = true;
+            help_pressed = false;
+        }
+
         glClear(GL_COLOR_BUFFER_BIT);
 
         ri_use_shader(p->ri, SHADER_IMAGE);
-        ri_render_image(p->ri, bg, 0, 0, SCRW, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
-        ri_render_image(p->ri, hover ? btn_hover : btn, SCRW / 2.f - 100.f, SCRH / 2.f - 50.f, 200, 100, (vec2){ 0.f, 0.f }, (vec2){ 1.f + expand, 1.f + expand });
-        // 1280x720
-        ri_render_image(p->ri, title_art, SCRW / 2.f - 300.f, SCRH - 150.f, 600.f, 600.f / 1280.f * 200.f, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+
+        if (display_help)
+        {
+            ri_render_image(p->ri, help, 0, 0, SCRW, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+
+            if (glfwGetKey(p->win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+                display_help = false;
+        }
+        else
+        {
+            ri_render_image(p->ri, bg, 0, 0, SCRW, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+            ri_render_image(p->ri, hover ? btn_hover : btn, SCRW / 2.f - 100.f, SCRH / 2.f - 50.f, 200, 100, (vec2){ 0.f, 0.f }, (vec2){ 1.f + expand, 1.f + expand });
+            // 1280x720
+            ri_render_image(p->ri, title_art, SCRW / 2.f - 300.f, SCRH - 150.f, 600.f, 600.f / 1280.f * 200.f, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+
+            ri_render_image(p->ri, help_hover ? help_btn_hover : help_btn, SCRW / 2.f - 70.f, SCRH / 2.f - 35.f, 140.f, 70.f, (vec2){ 0.f, -155.f / SCRH }, (vec2){ 1.f + help_expand, 1.f + help_expand });
+        }
 
         glfwSwapBuffers(p->win);
         glfwPollEvents();
     }
 
+    tex_free(help);
+    tex_free(help_btn);
+    tex_free(help_btn_hover);
     tex_free(title_art);
     tex_free(btn_hover);
     tex_free(btn);
