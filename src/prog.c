@@ -123,18 +123,26 @@ void prog_game(struct Prog *p)
         glClearColor(grey, grey, grey, 1.f);
     }
 
-    float last_submit = -100.f;
+    float last_submit = glfwGetTime();
     float check_expand = 1.f;
     float check_expand_vel = .1f;
     float check_expand_acc = -.01f;
     bool submit_correct = false;
+    bool show_checkmark = false;
+
+    float question_view_time = 3.f;
+    vec4 qdefault_viewport = { SCRW - QWIDTH, SCRH - QHEIGHT, QWIDTH, QHEIGHT };
+    vec4 center_viewport = { SCRW / 2.f - QWIDTH, SCRH / 2.f - QHEIGHT, QWIDTH * 2.f, QHEIGHT * 2.f };
+    vec4 question_viewport;
+    glm_vec4_copy(qdefault_viewport, question_viewport);
 
     while (p->running)
     {
         if (glfwWindowShouldClose(p->win))
             p->running = false;
 
-        board_update(p->board);
+        if (glfwGetTime() - last_submit > question_view_time)
+            board_update(p->board);
 
         if (p->board->last_cleared)
         {
@@ -149,6 +157,8 @@ void prog_game(struct Prog *p)
                 submit_correct = false;
                 last_submit = glfwGetTime();
             }
+
+            show_checkmark = true;
 
             ++p->total;
             p->curr_q = rand() % p->nquestions;
@@ -193,13 +203,13 @@ void prog_game(struct Prog *p)
         board_render(p->board, p->ri);
 
         // Game checkmark
-        if (glfwGetTime() - last_submit < .5f)
+        if (show_checkmark)
         {
             check_expand += check_expand_vel;
             check_expand_vel += check_expand_acc;
             if (check_expand < 0.f)
             {
-                last_submit = -100.f;
+                show_checkmark = false;
                 check_expand = 1.f;
                 check_expand_vel = .1f;
             }
@@ -220,13 +230,31 @@ void prog_game(struct Prog *p)
 
         // Questions
         ri_use_shader(p->ri, SHADER_IMAGE);
-        glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
+        glViewport(question_viewport[0], question_viewport[1], question_viewport[2], question_viewport[3]);
+
+        if (glfwGetTime() - last_submit < question_view_time && glfwGetTime() - last_submit > .2f)
+        {
+            question_viewport[0] += (center_viewport[0] - question_viewport[0]) / 8.f;
+            question_viewport[1] += (center_viewport[1] - question_viewport[1]) / 8.f;
+            question_viewport[2] += (center_viewport[2] - question_viewport[2]) / 8.f;
+            question_viewport[3] += (center_viewport[3] - question_viewport[3]) / 8.f;
+        }
+        else
+        {
+            question_viewport[0] += (qdefault_viewport[0] - question_viewport[0]) / 8.f;
+            question_viewport[1] += (qdefault_viewport[1] - question_viewport[1]) / 8.f;
+            question_viewport[2] += (qdefault_viewport[2] - question_viewport[2]) / 8.f;
+            question_viewport[3] += (qdefault_viewport[3] - question_viewport[3]) / 8.f;
+        }
 
         glDisable(GL_CULL_FACE);
-        ri_render_image(p->ri, p->questions[p->curr_q]->tex, 0, SCRH - QHEIGHT, SCRW, QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        // if (glfwGetTime() - last_submit > question_view_time)
+        //     ri_render_image(p->ri, p->questions[p->curr_q]->tex, 0, SCRH - QHEIGHT, SCRW, QHEIGHT, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
+        ri_render_image(p->ri, p->questions[p->curr_q]->tex, 0, 0, SCRW, SCRH, (vec2){ 0.f, 0.f }, (vec2){ 1.f, 1.f });
 
         // Ranking
         {
+            glViewport(SCRW - QWIDTH, 0, QWIDTH, SCRH);
             float ranking_text_w = 75.f * (SCRW / QWIDTH);
             float resize = 1.3f;
             float start_y = SCRH - QHEIGHT - 45.f;
